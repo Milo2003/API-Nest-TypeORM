@@ -9,8 +9,8 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 
-import { BrandsService } from 'src/services/brands/brands.service';
-import { CreateBrandDto, UpdateBrandDto } from '../../dtos/brands.dtos';
+import { BrandsService } from '../services/brands.service';
+import { CreateBrandDto, UpdateBrandDto } from '../dtos/brands.dtos';
 
 @Controller('brands')
 export class BrandsController {
