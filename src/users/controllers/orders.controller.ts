@@ -20,10 +20,10 @@ export class OrdersController {
   get() {
     return this.ordersService.findAll();
   }
-  @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.ordersService.findOne(id);
-  }
+  // @Get(':id')
+  // getOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.ordersService.findOne(id);
+  // }
 
   @Post()
   create(@Body() payload: CreateOrderDto) {
