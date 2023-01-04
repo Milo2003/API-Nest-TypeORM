@@ -1,22 +1,36 @@
 import { Module } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import * as Joi from 'joi';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
+import { DatabaseModule } from './database/database.module';
 import axios from 'axios';
-
-const API_KEY = '123456';
-const PROD_API_KEY = 'PROD_123456';
+import { environments } from './environments';
+import config from './config';
 @Module({
-  imports: [UsersModule, ProductsModule, HttpModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: environments[process.env.NODE_ENV] || '.env',
+      load: [config],
+      isGlobal: true,
+      validationSchema: Joi.object({
+        API_KEY: Joi.number(),
+        DATABASE_NAME: Joi.string(),
+        DATABASE_PORT: Joi.number(),
+      }),
+    }),
+    UsersModule,
+    ProductsModule,
+    HttpModule,
+    DatabaseModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: 'API_KEY',
-      useValue: process.env.NODE_ENV === 'prod' ? PROD_API_KEY : API_KEY,
-    },
     {
       provide: 'TASKS',
       useFactory: async () => {
