@@ -6,11 +6,15 @@ import {
   Post,
   Delete,
   Put,
-  ParseIntPipe,
 } from '@nestjs/common';
 
 import { OrdersService } from '../services/orders.service';
-import { CreateOrderDto, UpdateOrderDto } from '../dtos/orders.dtos';
+import {
+  AddProductsToOrderDto,
+  CreateOrderDto,
+  UpdateOrderDto,
+} from '../dtos/orders.dtos';
+import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 
 @Controller('orders')
 export class OrdersController {
@@ -20,10 +24,10 @@ export class OrdersController {
   get() {
     return this.ordersService.findAll();
   }
-  // @Get(':id')
-  // getOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.ordersService.findOne(id);
-  // }
+  @Get(':id')
+  getOne(@Param('id', MongoIdPipe) id: string) {
+    return this.ordersService.findOne(id);
+  }
 
   @Post()
   create(@Body() payload: CreateOrderDto) {
@@ -32,11 +36,22 @@ export class OrdersController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() payload: UpdateOrderDto) {
-    return this.ordersService.update(+id, payload);
+    return this.ordersService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.ordersService.delete(+id);
+  delete(@Param('id', MongoIdPipe) id: string) {
+    return this.ordersService.delete(id);
+  }
+  @Delete(':id/product/:productId')
+  removeProduct(
+    @Param('id') id: string,
+    @Param('productId') productId: string,
+  ) {
+    return this.ordersService.removeProduct(id, productId);
+  }
+  @Put(':id/products')
+  addProducts(@Param('id') id: string, @Body() payload: AddProductsToOrderDto) {
+    return this.ordersService.addProducts(id, payload.productsIds);
   }
 }

@@ -1,59 +1,74 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+// import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
+// import { CreateUserDto, UpdateUserDto } from '../dtos/userModel.dtos';
 import { User } from '../entities/user.entety';
 
 @Injectable()
-export class UsersService {
+export class userService {
   constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
     private productsService: ProductsService,
-    private configService: ConfigService,
   ) {}
 
-  private counterId = 1;
-  private users: User[] = [];
-
   findAll() {
-    const apiKey = this.configService.get('API_KEY');
-    const dbName = this.configService.get('DATABASE_NAME');
-    console.log(apiKey, dbName);
-    return this.users;
+    //solo ej
+    // const apiKey = this.configService.get('API_KEY');
+    // const dbName = this.configService.get('DATABASE_NAME');
+    // console.log(apiKey, dbName);
+    return this.userModel.find().exec();
   }
-  findOne(id: number) {
-    const user = this.users.find((item) => item.id === id);
+  findOne(id: string) {
+    const user = this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
     return user;
   }
-  create(payload: CreateUserDto) {
-    this.counterId += 1;
-    const newUser = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.users.push(newUser);
-    return newUser;
+  create(data: CreateUserDto) {
+    const newUser = new this.userModel(data);
+    return newUser.save();
   }
-  delete(id: number) {
-    const index = this.users.findIndex((item) => item.id === id);
-    if (index === -1) {
+  // create(payload: CreateUserDto) {
+  //   const newUser = {
+  //     ...payload,
+  //   };
+  //   this.userModel.create(newUser);
+  //   return newUser;
+  // }
+  delete(id: string) {
+    const index = this.userModel.findByIdAndDelete(id).exec();
+    if (!index) {
       throw new NotFoundException(`User #${id} not found`);
     }
-    this.users.splice(index, 1);
-    return { message: `El Usero ${id} se elimino correctamente` };
+    return { message: `User ${id} has been deleted ` };
   }
-  update(id: number, payload: UpdateUserDto) {
-    const find = this.findOne(id);
-    if (find) {
-      const index = this.users.findIndex((item) => item.id === id);
-      this.users[index] = {
-        ...find,
-        ...payload,
-      };
-      return this.users[index];
+  update(id: string, changes: UpdateUserDto) {
+    const user = this.userModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
     }
-    return null;
+    return user;
+  }
+  // update(id: number, payload: UpdateUserDto) {
+  //   const user = this.userModel.findByIdAndUpdate(id, payload);
+  //   return user;
+  //   // this.userModel[index] = {
+  //   //   ...find,
+  //   //   ...payload,
+  //   // };
+  // }
+  async getOrderByUser(id: string) {
+    const user = this.findOne(id);
+    return {
+      date: new Date(),
+      user,
+      products: await this.productsService.findAll(),
+    };
   }
 }

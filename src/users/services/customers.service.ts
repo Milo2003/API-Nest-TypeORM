@@ -1,49 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customers.dtos';
 import { Customer } from '../entities/customer.entety';
 
 @Injectable()
 export class CustomersService {
-  private counterId = 1;
-  private customers: Customer[] = [];
-
+  constructor(
+    @InjectModel(Customer.name) private customerModel: Model<Customer>,
+  ) {}
   findAll() {
-    return this.customers;
+    return this.customerModel.find();
   }
-  findOne(id: number) {
-    const Customer = this.customers.find((item) => item.id === id);
-    if (!Customer) {
+  async findOne(id: string) {
+    const customer = await this.customerModel.findById(id);
+    if (!customer) {
       throw new NotFoundException(`Customer #${id} not found`);
     }
-    return Customer;
+    return customer;
   }
-  create(payload: CreateCustomerDto) {
-    this.counterId += 1;
-    const newCustomer = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.customers.push(newCustomer);
-    return newCustomer;
+  create(data: CreateCustomerDto) {
+    console.log(data);
+    const newCustomer = new this.customerModel(data);
+    return newCustomer.save();
   }
-  delete(id: number) {
-    const index = this.customers.findIndex((item) => item.id === id);
-    if (index === -1) {
+  delete(id: string) {
+    const customer = this.customerModel.findByIdAndDelete(id);
+    if (!customer) {
       throw new NotFoundException(`Customer #${id} not found`);
     }
-    this.customers.splice(index, 1);
     return { message: `El Customer ${id} se elimino correctamente` };
   }
-  update(id: number, payload: UpdateCustomerDto) {
-    const find = this.findOne(id);
-    if (find) {
-      const index = this.customers.findIndex((item) => item.id === id);
-      this.customers[index] = {
-        ...find,
-        ...payload,
-      };
-      return this.customers[index];
+  update(id: string, changes: UpdateCustomerDto) {
+    const customer = this.customerModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
+    if (!customer) {
+      throw new NotFoundException();
     }
-    return null;
+    return customer;
   }
 }

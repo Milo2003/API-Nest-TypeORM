@@ -1,10 +1,4 @@
-import {
-  IsNumber,
-  IsString,
-  IsUrl,
-  IsNotEmpty,
-  IsPositive,
-} from 'class-validator';
+import { IsString, IsUrl, IsNotEmpty, IsOptional } from 'class-validator';
 import { PartialType, ApiProperty } from '@nestjs/swagger';
 
 export class CreateCategoryDto {
@@ -13,19 +7,9 @@ export class CreateCategoryDto {
   @IsString()
   readonly name: string;
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   readonly description: string;
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  readonly price: number;
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  readonly stock: number;
   @ApiProperty()
   @IsNotEmpty()
   @IsUrl()

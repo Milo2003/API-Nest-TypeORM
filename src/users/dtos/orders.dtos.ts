@@ -1,18 +1,26 @@
-import { IsNumber, IsNotEmpty, IsPositive, IsDate } from 'class-validator';
-import { PartialType, ApiProperty } from '@nestjs/swagger';
-import { User } from '../entities/user.entety';
-import { Product } from 'src/products/entities/product.entety';
-
+import {
+  IsNumber,
+  IsNotEmpty,
+  IsPositive,
+  IsDate,
+  IsMongoId,
+  IsArray,
+} from 'class-validator';
+import { PartialType, ApiProperty, OmitType } from '@nestjs/swagger';
 export class CreateOrderDto {
+  @IsNotEmpty()
+  @IsMongoId()
+  readonly customer: string;
   @ApiProperty()
   @IsDate()
   readonly date: Date;
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // readonly user: User;
   @ApiProperty()
+  @IsArray()
   @IsNotEmpty()
-  readonly user: User;
-  @ApiProperty()
-  @IsNotEmpty()
-  readonly products: Product;
+  readonly products: string[];
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
@@ -25,4 +33,12 @@ export class CreateOrderDto {
   readonly total: number;
 }
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
+export class UpdateOrderDto extends PartialType(
+  OmitType(CreateOrderDto, ['products']),
+) {}
+
+export class AddProductsToOrderDto {
+  @IsArray()
+  @IsNotEmpty()
+  readonly productsIds: string[];
+}

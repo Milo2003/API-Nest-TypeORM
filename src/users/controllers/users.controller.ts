@@ -9,34 +9,35 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 
-import { UsersService } from '../services/users.service';
+import { userService } from '../services/users.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
+import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private user: userService) {}
 
   @Get()
   get() {
-    return this.usersService.findAll();
+    return this.user.findAll();
   }
   @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  getOne(@Param('id', MongoIdPipe) id: string) {
+    return this.user.findOne(id);
   }
 
   @Post()
   create(@Body() payload: CreateUserDto) {
-    return this.usersService.create(payload);
+    return this.user.create(payload);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() payload: UpdateUserDto) {
-    return this.usersService.update(+id, payload);
+    return this.user.update(id, payload);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return this.usersService.delete(+id);
+    return this.user.delete(id);
   }
 }
