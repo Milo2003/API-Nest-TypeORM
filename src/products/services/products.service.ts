@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import {
   CreateProductDto,
@@ -12,76 +12,53 @@ import { Product } from '../entities/product.entety';
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel(Product.name) private productModel: Model<Product>,
+    @InjectRepository(Product, 'postgres')
+    private productRepo: Repository<Product>,
   ) {}
-
-  // private counterId = 1;
-  // private productModel: Product[] = [
-  //   {
-  //     id: 1,
-  //     name: 'Product 1',
-  //     description: 'bla bla',
-  //     price: 122,
-  //     image: '',
-  //     stock: 12,
-  //   },
-  // ];
-
   findAll(params?: FilterProductDto) {
     if (params) {
-      const filters: FilterQuery<Product> = {};
-      const { limit, offset } = params;
-      const { minPrice, maxPrice } = params;
-      if (minPrice && maxPrice) {
-        filters.price = { $gte: minPrice, $lte: maxPrice };
-      }
-      return this.productModel
-        .find(filters)
-        .populate('brand')
-        .skip(offset)
-        .limit(limit)
-        .exec();
+      // const filters: FilterQuery<Product> = {};
+      // const { limit, offset } = params;
+      // const { minPrice, maxPrice } = params;
+      // if (minPrice && maxPrice) {
+      //   filters.price = { $gte: minPrice, $lte: maxPrice };
+      // }
+      return this.productRepo.find();
+      // return this.productRepo.find(filters).skip(offset).limit(limit).exec();
     }
-    return this.productModel.find().populate('brand').exec();
+    return this.productRepo.find();
   }
-  async findOne(id: string) {
-    const product = await this.productModel
-      .findById(id)
-      .populate('brand')
-      .exec();
+  async findOne(id: number) {
+    const product = await this.productRepo.findOneBy({ id });
     if (!product) {
       throw new NotFoundException(`Product #${id} not found`);
     }
     return product;
-  }
-  async delete(id: string) {
-    const product = await this.productModel.findByIdAndDelete(id).exec();
-    if (!product) {
-      throw new NotFoundException(`Product #${id} not found`);
-    }
-    return { message: `product ${product.id} has been deleted` };
   }
   create(data: CreateProductDto) {
-    const product = new this.productModel(data);
-    return product.save();
+    // const product = new Product();
+    // product.name = data.name;
+    // product.description = data.description;
+    // product.price = data.price;
+    // product.stock = data.stock;
+    // product.image = data.image;
+    // return this.productRepo.save(product);
+    const product = this.productRepo.create(data);
+    return this.productRepo.save(product);
   }
-  // delete(id: number) {
-  //   const index = this.productModel.findIndex((item) => item.id === id);
-  //   if (index === -1) {
-  //     throw new NotFoundException(`Product #${id} not found`);
-  //   }
-  //   this.productModel.splice(index, 1);
-  //   return { message: `El producto ${id} se elimino correctamente` };
-  // }
-  update(id: string, changes: UpdateProductDto) {
-    const product = this.productModel.findByIdAndUpdate(
-      id,
-      { $set: changes },
-      { new: true },
-    );
+  async update(id: number, changes: UpdateProductDto) {
+    const product = await this.productRepo.findOneBy({ id });
     if (!product) {
       throw new NotFoundException(`Product #${id} not found`);
     }
-    return product;
+    this.productRepo.merge(product, changes);
+    return this.productRepo.save(product);
+  }
+  async delete(id: number) {
+    const deleteProduct = await this.productRepo.delete(id);
+    if (deleteProduct.affected === 0) {
+      throw new NotFoundException(`Product #${id} not found`);
+    }
+    return { message: `The product ${id} has been deleted` };
   }
 }

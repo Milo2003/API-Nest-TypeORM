@@ -1,12 +1,45 @@
-version: 'version'
+version: '3.1'
 
 services:
-  mongo:
-    image: mongo:5.0
+  postgres:
+    image: postgres:15
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
+      - POSTGRES_DB=milo_db
+      - POSTGRES_USER=milinhoroot36971992
+      - POSTGRES_PASSWORD=NestJs-TypeORM$36971992
     ports:
-    - 27017:27017
+      - '5432:5432'
     volumes:
-      - ./mongo_data:/data/db
+      - ./postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=milinhoroot36971992
+    ports:
+      - "5050:80"
+
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_DATABASE=milo_db
+      - MYSQL_ROOT_PASSWORD=NestJsTypeORM36971992
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    depends_on:
+      - postgres
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=NestJsTypeORM36971992
+      - PMA_HOST=mysql
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql

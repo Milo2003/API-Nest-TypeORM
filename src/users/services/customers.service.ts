@@ -1,43 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customers.dtos';
 import { Customer } from '../entities/customer.entety';
 
 @Injectable()
 export class CustomersService {
   constructor(
-    @InjectModel(Customer.name) private customerModel: Model<Customer>,
+    @InjectRepository(Customer, 'postgres')
+    private customerRepo: Repository<Customer>,
   ) {}
   findAll() {
-    return this.customerModel.find();
+    return this.customerRepo.find();
   }
-  async findOne(id: string) {
-    const customer = await this.customerModel.findById(id);
+  async findOne(id: number) {
+    const customer = await this.customerRepo.findOneBy({ id });
     if (!customer) {
       throw new NotFoundException(`Customer #${id} not found`);
     }
     return customer;
   }
   create(data: CreateCustomerDto) {
-    console.log(data);
-    const newCustomer = new this.customerModel(data);
-    return newCustomer.save();
+    const newCustomer = this.customerRepo.create(data);
+    return this.customerRepo.save(newCustomer);
   }
-  delete(id: string) {
-    const customer = this.customerModel.findByIdAndDelete(id);
-    if (!customer) {
+  async delete(id: number) {
+    const customer = await this.customerRepo.delete(id);
+    if (customer.affected === 0) {
       throw new NotFoundException(`Customer #${id} not found`);
     }
     return { message: `El Customer ${id} se elimino correctamente` };
   }
-  update(id: string, changes: UpdateCustomerDto) {
-    const customer = this.customerModel
-      .findByIdAndUpdate(id, { $set: changes }, { new: true })
-      .exec();
+  async update(id: number, changes: UpdateCustomerDto) {
+    const customer = await this.customerRepo.findOneBy({ id });
     if (!customer) {
-      throw new NotFoundException();
+      throw new NotFoundException(`Customer #${id} not found`);
     }
-    return customer;
+    this.customerRepo.merge(customer, changes);
+    return this.customerRepo.save(customer);
   }
 }

@@ -6,12 +6,10 @@ import {
   Post,
   Delete,
   Put,
-  ParseIntPipe,
 } from '@nestjs/common';
 
 import { userService } from '../services/users.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
-import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +19,13 @@ export class UsersController {
   get() {
     return this.user.findAll();
   }
+  @Get('/tasks')
+  getTasks() {
+    return this.user.getTasks();
+  }
+
   @Get(':id')
-  getOne(@Param('id', MongoIdPipe) id: string) {
+  getOne(@Param('id') id: number) {
     return this.user.findOne(id);
   }
 
@@ -32,12 +35,12 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() payload: UpdateUserDto) {
     return this.user.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: number) {
     return this.user.delete(id);
   }
 }

@@ -25,7 +25,7 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
   @Get(':id')
-  getOne(@Param('id', MongoIdPipe) id: string) {
+  getOne(@Param('id') id: number) {
     return this.ordersService.findOne(id);
   }
 
@@ -35,23 +35,23 @@ export class OrdersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateOrderDto) {
+  update(@Param('id') id: number, @Body() payload: UpdateOrderDto) {
     return this.ordersService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id', MongoIdPipe) id: string) {
+  delete(@Param('id') id: number) {
     return this.ordersService.delete(id);
   }
-  @Delete(':id/product/:productId')
-  removeProduct(
-    @Param('id') id: string,
-    @Param('productId') productId: string,
-  ) {
-    return this.ordersService.removeProduct(id, productId);
-  }
-  @Put(':id/products')
-  addProducts(@Param('id') id: string, @Body() payload: AddProductsToOrderDto) {
-    return this.ordersService.addProducts(id, payload.productsIds);
-  }
+  // @Delete(':id/product/:productId')
+  // removeProduct(
+  //   @Param('id') id: number,
+  //   @Param('productId') productId: number,
+  // ) {
+  //   return this.ordersService.removeProduct(id, productId);
+  // }
+  // @Put(':id/products')
+  // addProducts(@Param('id') id: number, @Body() payload: AddProductsToOrderDto) {
+  //   return this.ordersService.addProducts(id, payload.productsIds);
+  // }
 }

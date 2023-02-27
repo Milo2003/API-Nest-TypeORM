@@ -1,74 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 // import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Client } from 'pg';
+
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
-// import { CreateUserDto, UpdateUserDto } from '../dtos/userModel.dtos';
 import { User } from '../entities/user.entety';
 
 @Injectable()
 export class userService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectRepository(User, 'postgres') private userRepo: Repository<User>,
     private productsService: ProductsService,
+    @Inject('PG') private clientPg: Client,
   ) {}
 
   findAll() {
-    //solo ej
-    // const apiKey = this.configService.get('API_KEY');
-    // const dbName = this.configService.get('DATABASE_NAME');
-    // console.log(apiKey, dbName);
-    return this.userModel.find().exec();
+    return this.userRepo.find();
   }
-  findOne(id: string) {
-    const user = this.userModel.findById(id);
+  findOne(id: number) {
+    const user = this.userRepo.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
     return user;
   }
   create(data: CreateUserDto) {
-    const newUser = new this.userModel(data);
-    return newUser.save();
+    const newUser = this.userRepo.create(data);
+    return this.userRepo.save(newUser);
   }
-  // create(payload: CreateUserDto) {
-  //   const newUser = {
-  //     ...payload,
-  //   };
-  //   this.userModel.create(newUser);
-  //   return newUser;
-  // }
-  delete(id: string) {
-    const index = this.userModel.findByIdAndDelete(id).exec();
-    if (!index) {
+  async delete(id: number) {
+    const newUser = await this.userRepo.delete(id);
+    if (newUser.affected === 0) {
       throw new NotFoundException(`User #${id} not found`);
     }
     return { message: `User ${id} has been deleted ` };
   }
-  update(id: string, changes: UpdateUserDto) {
-    const user = this.userModel
-      .findByIdAndUpdate(id, { $set: changes }, { new: true })
-      .exec();
-    if (!user) {
+  async update(id: number, changes: UpdateUserDto) {
+    const newUser = await this.userRepo.findOneBy({ id })
+    if (!newUser) {
       throw new NotFoundException(`User #${id} not found`);
     }
-    return user;
+    this.userRepo.merge(newUser, changes);
+    return this.userRepo.save(newUser);
   }
-  // update(id: number, payload: UpdateUserDto) {
-  //   const user = this.userModel.findByIdAndUpdate(id, payload);
-  //   return user;
-  //   // this.userModel[index] = {
-  //   //   ...find,
-  //   //   ...payload,
-  //   // };
-  // }
-  async getOrderByUser(id: string) {
-    const user = this.findOne(id);
+  async getOrderByUser(id: number) {
+    const user = this.userRepo.findOneBy({ id });
     return {
       date: new Date(),
       user,
       products: await this.productsService.findAll(),
     };
+  }
+  getTasks() {
+    return new Promise((resolve, reject) => {
+      //ejecutamos la consulta a la db como una promesa, esto nos trae las tablas que tenemos en la postgresdb
+      this.clientPg.query('SELECT * FROM tasks', (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res.rows);
+      });
+    });
   }
 }

@@ -40,4 +40,4 @@ lerna-debug.log*
 .stag.env
 
 # DB
-/mongo_data
+/postgresql_data
