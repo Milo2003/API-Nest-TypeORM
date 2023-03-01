@@ -28,6 +28,13 @@ export default registerAs('config', () => {
       port: parseInt(process.env.MYSQL_PORT, 10),
       host: process.env.MYSQL_HOST,
     },
+    mariadb: {
+      dbName: process.env.MARIADB_DATABASE,
+      user: process.env.MARIADB_USER,
+      password: process.env.MARIADB_ROOT_PASSWORD,
+      port: parseInt(process.env.MARIADB_PORT, 10),
+      host: process.env.MARIADB_HOST,
+    },
     apiKey: process.env.API_KEY,
   };
 });

@@ -1,6 +1,10 @@
-// import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
-// import { Document, Types } from 'mongoose';
-import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 // import { Brand } from './brand.entety';
 // import { SubDoc, SubDocSchema } from './subDoc.entity';
@@ -8,21 +12,21 @@ import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
-  // @Prop({ required: true })
   @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
-  // @Prop()
   @Column({ type: 'text' })
   description: string;
-  // @Prop({ type: Number, index: true })
   @Column({ type: 'int' })
   price: number;
-  // @Prop({ type: Number })
   @Column({ type: 'int' })
   stock: number;
-  // @Prop()
   @Column({ type: 'varchar' })
   image?: string;
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
   // @Prop(
   //   raw({
   //     name: { type: String },
@@ -43,6 +47,3 @@ export class Product {
   // // @Prop({ type: [SubDocSchema] })
   // // subDocs: Types.Array<SubDoc>;
 }
-
-// export const ProductSchema = SchemaFactory.createForClass(Product);
-// ProductSchema.index({ price: 1, stock: -1 });

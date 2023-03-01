@@ -14,7 +14,6 @@ import {
   CreateOrderDto,
   UpdateOrderDto,
 } from '../dtos/orders.dtos';
-import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 
 @Controller('orders')
 export class OrdersController {

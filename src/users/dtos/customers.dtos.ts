@@ -1,8 +1,13 @@
-import { IsString, IsNotEmpty, IsPhoneNumber, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { PartialType, ApiProperty } from '@nestjs/swagger';
-import { type } from 'os';
 import { Type } from 'class-transformer';
-import { CreateSubDocDto } from 'src/products/dtos/subDoc.dtos';
+import { CreateSubDocDto } from '../../products/dtos/subDoc.dtos';
 
 export class CreateCustomerDto {
   @ApiProperty()

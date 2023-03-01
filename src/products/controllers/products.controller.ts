@@ -8,7 +8,6 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
-import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ProductsService } from '../services/products.service';

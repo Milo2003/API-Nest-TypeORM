@@ -1,11 +1,10 @@
-import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Schema()
 export class SubDoc {
-  @Prop()
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
   name: string;
-  @Prop()
+  @Column()
   description: string;
 }
-
-export const SubDocSchema = SchemaFactory.createForClass(SubDoc);

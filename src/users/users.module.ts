@@ -4,7 +4,7 @@ import { CustomersController } from './controllers/customers.controller';
 import { CustomersService } from './services/customers.service';
 import { UsersController } from './controllers/users.controller';
 import { userService } from './services/users.service';
-import { ProductsModule } from 'src/products/products.module';
+import { ProductsModule } from '../products/products.module';
 import { User } from './entities/user.entety';
 import { Order } from './entities/order.entety';
 import { Customer } from './entities/customer.entety';

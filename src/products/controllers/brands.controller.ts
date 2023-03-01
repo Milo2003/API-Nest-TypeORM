@@ -33,12 +33,12 @@ export class BrandController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateBrandDto) {
+  update(@Param('id') id: number, @Body() payload: UpdateBrandDto) {
     return this.brandsService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: number) {
     return this.brandsService.delete(id);
   }
 }

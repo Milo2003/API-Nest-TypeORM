@@ -25,21 +25,30 @@ services:
     restart: always
     environment:
       - MYSQL_DATABASE=milo_db
-      - MYSQL_ROOT_PASSWORD=NestJsTypeORM36971992
+      - MYSQL_ROOT_PASSWORD=example
     ports:
-      - '3306:3306'
+      - '3307:3306'
     volumes:
       - ./mysql_data:/var/lib/mysql
-    depends_on:
-      - postgres
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      - MYSQL_DATABASE=nore_db
+      - MYSQL_ROOT_PASSWORD=example
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+    ports:
+      - 3306:3306
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=NestJsTypeORM36971992
-      - PMA_HOST=mysql
+      - MYSQL_ROOT_PASSWORD=example
+      - PMA_HOST=mariadb,mysql
+      - PMA_PORTS=3306,3307
     ports:
       - "8080:80"
-    depends_on:
-      - mysql
+
+

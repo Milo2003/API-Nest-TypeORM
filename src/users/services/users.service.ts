@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Client } from 'pg';
 
-import { ProductsService } from 'src/products/services/products.service';
+import { ProductsService } from '../../products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
 import { User } from '../entities/user.entety';
 
