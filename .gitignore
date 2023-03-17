@@ -10,3 +10,4 @@ temp/
 /mariadb_data
 /mysql_data
 /postgres_data
+/node_modules
