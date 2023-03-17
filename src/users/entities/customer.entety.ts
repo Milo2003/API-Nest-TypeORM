@@ -1,5 +1,16 @@
-// import { SubDocSchema, SubDoc } from 'src/products/entities/subDoc.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
+import { Order } from './order.entety';
+
+import { User } from './user.entety';
+@Entity()
 export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
@@ -9,11 +20,18 @@ export class Customer {
   lastName: string;
   @Column({ type: 'varchar' })
   phone: string;
-  // @Prop({
-  //   type: [{ name: { type: String }, color: { type: String } }],
-  // })
-  // skills: Types.Array<Record<string, any>>;
-  // @Prop({ type: [SubDocSchema] })
-  // subDocs: Types.Array<SubDoc>;
-  //El subdoc es un ejemplo de como tipar las relaciones( en este caso uno a muchos, el tipado es de un array con objetos, las skills lo podrian usar)
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
+  @OneToOne(() => User, (user) => user.customer, { nullable: true })
+  user: User;
+  @OneToMany(() => Order, (order) => order.customer)
+  orders: Order[];
 }

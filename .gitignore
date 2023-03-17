@@ -4,3 +4,9 @@ node_modules/
 build/
 tmp/
 temp/
+
+.env
+
+/mariadb_data
+/mysql_data
+/postgres_data

@@ -2,12 +2,12 @@ import {
   IsString,
   IsNotEmpty,
   IsPhoneNumber,
-  IsArray,
-  ValidateNested,
+  // IsArray,
+  // ValidateNested,
 } from 'class-validator';
 import { PartialType, ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { CreateSubDocDto } from '../../products/dtos/subDoc.dtos';
+// import { Type } from 'class-transformer';
+// import { CreateSubDocDto } from '../../products/dtos/subDoc.dtos';
 
 export class CreateCustomerDto {
   @ApiProperty()
@@ -22,16 +22,16 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   @IsPhoneNumber()
   readonly phone: string;
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsArray()
-  readonly skills: any;
-  @ApiProperty({ type: () => [CreateSubDocDto] })
-  @IsNotEmpty()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateSubDocDto)
-  readonly subDocs: CreateSubDocDto[];
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // @IsArray()
+  // readonly skills: any;
+  // @ApiProperty({ type: () => [CreateSubDocDto] })
+  // @IsNotEmpty()
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => CreateSubDocDto)
+  // readonly subDocs: CreateSubDocDto[];
 }
 
 export class UpdateCustomerDto extends PartialType(CreateCustomerDto) {}

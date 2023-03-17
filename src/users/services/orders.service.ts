@@ -3,25 +3,37 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateOrderDto, UpdateOrderDto } from '../dtos/orders.dtos';
+import { Customer } from '../entities/customer.entety';
 import { Order } from '../entities/order.entety';
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order, 'postgres') private orderRepo: Repository<Order>,
+    @InjectRepository(Customer, 'postgres')
+    private customerRepo: Repository<Customer>,
   ) {}
 
   findAll() {
-    return this.orderRepo.find();
+    return this.orderRepo.find({ relations: ['customer'] });
   }
   async findOne(id: number) {
-    const order = await this.orderRepo.findOneBy({ id });
+    const order = await this.orderRepo.find({
+      where: { id },
+      relations: ['products', 'products.product'],
+    });
     if (!order) {
-      throw new NotFoundException(`orders del ${id} not found`);
+      throw new NotFoundException(`order #${id} not found`);
     }
     return order;
   }
-  create(data: CreateOrderDto) {
+  async create(data: CreateOrderDto) {
     const newOrder = this.orderRepo.create(data);
+    if (data.customerId) {
+      const customer = await this.customerRepo.findOneBy({
+        id: data.customerId,
+      });
+      newOrder.customer = customer;
+    }
     return this.orderRepo.save(newOrder);
   }
   async delete(id: number) {
@@ -32,9 +44,15 @@ export class OrdersService {
     return { message: `La Orden ${id} se elimino correctamente` };
   }
   async update(id: number, changes: UpdateOrderDto) {
-    const order = await this.orderRepo.findOneBy({ id })
+    const order = await this.orderRepo.findOneBy({ id });
     if (!order) {
       throw new NotFoundException(`Order #${id} not found`);
+    }
+    if (changes.customerId) {
+      const customer = await this.customerRepo.findOneBy({
+        id: changes.customerId,
+      });
+      order.customer = customer;
     }
     this.orderRepo.merge(order, changes);
     return this.orderRepo.save(order);

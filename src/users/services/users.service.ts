@@ -7,17 +7,21 @@ import { Client } from 'pg';
 import { ProductsService } from '../../products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
 import { User } from '../entities/user.entety';
+import { CustomersService } from './customers.service';
 
 @Injectable()
 export class userService {
   constructor(
     @InjectRepository(User, 'postgres') private userRepo: Repository<User>,
     private productsService: ProductsService,
+    private customerService: CustomersService,
     @Inject('PG') private clientPg: Client,
   ) {}
 
   findAll() {
-    return this.userRepo.find();
+    return this.userRepo.find({
+      relations: ['customer'],
+    });
   }
   findOne(id: number) {
     const user = this.userRepo.findOneBy({ id });
@@ -26,8 +30,12 @@ export class userService {
     }
     return user;
   }
-  create(data: CreateUserDto) {
+  async create(data: CreateUserDto) {
     const newUser = this.userRepo.create(data);
+    if (data.customerId) {
+      const customer = await this.customerService.findOne(data.customerId);
+      newUser.customer = customer;
+    }
     return this.userRepo.save(newUser);
   }
   async delete(id: number) {
@@ -38,7 +46,7 @@ export class userService {
     return { message: `User ${id} has been deleted ` };
   }
   async update(id: number, changes: UpdateUserDto) {
-    const newUser = await this.userRepo.findOneBy({ id })
+    const newUser = await this.userRepo.findOneBy({ id });
     if (!newUser) {
       throw new NotFoundException(`User #${id} not found`);
     }

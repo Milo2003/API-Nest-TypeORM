@@ -35,12 +35,12 @@ export class CategoriesController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdateCategoryDto) {
-    return this.categoriesService.update(+id, payload);
+  update(@Param('id') id: number, @Body() payload: UpdateCategoryDto) {
+    return this.categoriesService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.categoriesService.delete(+id);
+  delete(@Param('id') id: number) {
+    return this.categoriesService.delete(id);
   }
 }

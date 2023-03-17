@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -11,6 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import axios from 'axios';
 import { environments } from './environments';
 import config from './config';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -45,6 +46,10 @@ import config from './config';
         return response.data;
       },
       inject: [HttpService],
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
     },
   ],
 })
