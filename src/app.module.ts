@@ -12,6 +12,7 @@ import axios from 'axios';
 import { environments } from './environments';
 import config from './config';
 import { APP_PIPE } from '@nestjs/core';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { APP_PIPE } from '@nestjs/core';
     ProductsModule,
     HttpModule,
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
