@@ -22,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       validationSchema: Joi.object({
         API_KEY: Joi.number(),
+        JWT_SECRET: Joi.string().required(),
         DATABASE_NAME: Joi.string(),
         DATABASE_PORT: Joi.number(),
         POSTGRES_DB: Joi.string(),

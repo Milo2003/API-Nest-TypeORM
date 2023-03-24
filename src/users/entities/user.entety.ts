@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -15,15 +16,18 @@ export class User {
   id: number;
   @Column({ type: 'varchar' })
   email: string;
+  @Exclude()
   @Column({ type: 'varchar' })
   password: string;
   @Column({ type: 'varchar' })
   role: string;
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createAt: Date;
+  @Exclude()
   @UpdateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',

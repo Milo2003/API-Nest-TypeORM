@@ -1,8 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Client } from 'pg';
+import * as bcrypt from 'bcrypt';
 
 import { ProductsService } from '../../products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
@@ -10,7 +10,7 @@ import { User } from '../entities/user.entety';
 import { CustomersService } from './customers.service';
 
 @Injectable()
-export class userService {
+export class UsersService {
   constructor(
     @InjectRepository(User, 'postgres') private userRepo: Repository<User>,
     private productsService: ProductsService,
@@ -32,11 +32,17 @@ export class userService {
   }
   async create(data: CreateUserDto) {
     const newUser = this.userRepo.create(data);
+    const hashPassword = await bcrypt.hash(newUser.password, 10);
+    newUser.password = hashPassword;
     if (data.customerId) {
       const customer = await this.customerService.findOne(data.customerId);
       newUser.customer = customer;
     }
     return this.userRepo.save(newUser);
+  }
+  async findByEmail(email: string) {
+    const user = this.userRepo.findOne({ where: { email } });
+    return user;
   }
   async delete(id: number) {
     const newUser = await this.userRepo.delete(id);
