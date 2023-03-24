@@ -45,6 +45,7 @@ lerna-debug.log*
 /postgres_data
 /node_modules
 
+dist/
 build/
 tmp/
 temp/
